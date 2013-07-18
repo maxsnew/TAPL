@@ -1,6 +1,9 @@
 #lang racket
 
 (require redex)
+(provide B
+         Br
+         Breductions)
 
 ;; The Boolean language in Figure 3-1
 
@@ -17,7 +20,7 @@
   (p (if p then t else t)
      hole))
 
-(define reductions
+(define Breductions
   (reduction-relation
    Br
    (==> (if true then t_1 else t_2)
@@ -59,31 +62,31 @@
 
 ;; Reduction relation tests
 (test-->>
- reductions
+ Breductions
  (term true)
  (term true))
 
 (test-->>
- reductions
+ Breductions
  (term false)
  (term false))
 
 (test-->>
- reductions
+ Breductions
  (term (if true
            then true
            else false))
  (term true))
 
 (test-->>
- reductions
+ Breductions
  (term (if false
            then false
            else true))
  (term true))
 
 (test-->>
- reductions
+ Breductions
  (term (if (if true
                then true
                else false)
@@ -92,7 +95,7 @@
  (term true))
 
 (test-->>
- reductions
+ Breductions
  (term (if true
            then (if true
                     then true
