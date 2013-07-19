@@ -112,6 +112,6 @@ instance Arbitrary Term where
 prop_big_small_agree :: Term -> Bool  
 prop_big_small_agree t =
   (isJust bigT && isVal smallT && smallT == (fromJust bigT)) 
-  || ((not . isJust $ bigT) && (not . isVal $ smallT))
+  || not ((isJust bigT) || (isVal smallT))
   where smallT = eval t
         bigT   = eval' t
