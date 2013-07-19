@@ -103,4 +103,21 @@
            else false))
  (term true))
 
+(define (all bs)
+  (foldl (λ (b1 b2) (and b1 b2))
+         #t
+         bs))
+
+;; All terms reduce to values
+;; And there is only one possible reduction order
+(redex-check
+ B
+ t
+ (or (redex-match? B v (term t))
+     (let ([reds (apply-reduction-relation* Breductions
+                                            (term t))])
+       (and (= (length reds) 1)
+            (redex-match? B v
+                          (car reds))))))
+
 (test-results)
