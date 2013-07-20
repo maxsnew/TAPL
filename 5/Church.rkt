@@ -2,12 +2,14 @@
 (require redex
          redex/tut-subst)
 
+(provide (all-defined-out))
+
 ;; Page 53
 (define-language λc
-  (t v
+  (t x
+     (λ x t)
      (t t))
-  (v x
-     (λ x t))
+  (v (λ x t))
   (x variable))
 
 ;; Call by value
@@ -127,13 +129,13 @@
 
 ;; Ex 5.2.4
 ;; λ m n . m^n
-(define exp
+(define xp
   `(λ m
       (λ n
          ((n (times m)) ,one))))
 
 ;; exponentation is function application!
-(define exp2
+(define xp2
   `(λ m
       (λ n
          (m n))))
@@ -145,7 +147,7 @@
 (define prd
   (let ([zz `((,pair ,zero) ,zero)]
         [ss `(λ p
-                ((,pair (snd p))
+                ((,pair (,snd p))
                  ((,plus ,one)
                   (,snd p))))])
     `(λ m
@@ -161,8 +163,8 @@
 (define eql
   `(λ m
       (λ n
-         ((and (iszro ((sub m n))))
-          (iszro ((sub n) m))))))
+         ((,nd (,iszro ((,sub m n))))
+          (,iszro ((,sub n) m))))))
 
 ;; Lists !
 ;; Ex 5.2.8
@@ -194,13 +196,13 @@
 
 ;; tail, analagous to predecessor
 (define tl
-  (λ l
-     (,fst
-      (l (λ x
-            (λ p
-               ((,pair (,snd p))
-                ((,cns x) (,snd p)))))
-         ((,pair ,nl) ,nl)))))
+  `(λ l
+      (,fst
+       (l (λ x
+             (λ p
+                ((,pair (,snd p))
+                 ((,cns x) (,snd p)))))
+          ((,pair ,nl) ,nl)))))
 
 ;; Note some tests fail, but they are all α-equivalent
 ;; Should maybe write an α-equivalence checker
