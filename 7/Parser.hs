@@ -2,10 +2,10 @@ module Parser where
 
 import Grammar
 
-import Control.Applicative
-import Control.Monad.Identity
+import Control.Applicative ((<$>), (<|>))
+import Control.Monad.Identity (Identity)
 import Prelude hiding (abs)
-import Text.Parsec hiding ((<|>), many)
+import Text.Parsec hiding((<|>), many)
 import Text.Parsec.Token hiding (parens, lexeme, identifier, reserved, braces, brackets, whiteSpace)
 import qualified Text.Parsec.Token as P
 import Text.Parsec.Language

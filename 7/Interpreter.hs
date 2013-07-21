@@ -1,10 +1,10 @@
-module Lambda where
+module Interpreter where
 
-import Grammar
+import Grammar (Term(..))
 
 import Control.Monad (mzero)
-import Data.Functor
-import Data.Maybe
+import Data.Functor ((<$>))
+import Data.Maybe (fromJust, isJust)
 
 topShift :: Int -> Term -> Term
 topShift i t = shift i 0 t

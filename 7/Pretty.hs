@@ -1,8 +1,8 @@
 module Pretty where
 
-import Grammar
+import Grammar (Term(..), NamedTerm(..))
 
-import Text.PrettyPrint
+import Text.PrettyPrint (Doc, (<+>), parens, text)
 
 term :: Term -> Doc
 term (Var i) = text $ show i
