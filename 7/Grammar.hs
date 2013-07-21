@@ -4,11 +4,13 @@ import Control.Applicative ((<$>), (<*>))
 import Control.Monad.Reader (Reader)
 import Test.QuickCheck
 
+-- | Untyped Lambda Calculus using De Bruijn indices for variables.
 data Term = Var Int
           | Abs Term
           | App Term Term
           deriving (Show, Eq)
 
+-- | Untyped Lambda Calculus using explicit variable names.
 data NamedTerm = NVar String
                | NAbs String NamedTerm
                | NApp NamedTerm NamedTerm
@@ -22,6 +24,7 @@ instance Arbitrary Term where
                           , App <$> halved <*> halved
                           ]
             where halved = term' (n `div` 2)
+
   shrink (App t1 t2) = [t1, t2]
   shrink (Abs t) = [t]
   shrink _ = []

@@ -14,7 +14,7 @@ type Parser a = ParsecT String () Identity a
 
 -- | Parsing
 term :: Parser NamedTerm
-term = lexeme $ abs <|> apps
+term = lexeme $ abs <|> apps <|> parens term
 
 var :: Parser NamedTerm
 var = (NVar <$> identifier)
@@ -47,7 +47,6 @@ identifier :: Parser String
 identifier = lexeme $ P.identifier lambdaCal
 reserved :: String -> Parser ()
 reserved = lexeme . (P.reserved lambdaCal)
-whiteSpace = P.whiteSpace lambdaCal
 
 lambdaStyle :: LanguageDef st
 lambdaStyle = emptyDef {
