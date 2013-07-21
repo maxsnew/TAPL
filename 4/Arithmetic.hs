@@ -1,4 +1,4 @@
-module Syntax where
+module Arithmetic where
 
 import Data.Maybe (fromJust, isJust)
 import Control.Applicative ((<$>), (<*>))
