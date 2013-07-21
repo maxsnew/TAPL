@@ -1,6 +1,6 @@
 module Pretty where
 
-import Lambda
+import Grammar
 
 import Text.PrettyPrint
 
@@ -21,4 +21,3 @@ namedTerm (NApp t1 t2) = prettyRand <+> prettyRator
           NVar{} -> namedTerm t2
           _      -> wrapped t2
         wrapped = parens . namedTerm
-

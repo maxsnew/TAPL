@@ -1,6 +1,6 @@
 module Parser where
 
-import Lambda
+import Grammar
 
 import Control.Applicative
 import Control.Monad.Identity
