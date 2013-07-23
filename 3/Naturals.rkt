@@ -3,6 +3,8 @@
 (require redex
          "Booleans.rkt")
 
+(provide NB NBr)
+
 ;; From Figure
 (define-extended-language NB
   Br ;; I guess keep the p here, maybe use union language
