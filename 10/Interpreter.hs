@@ -2,8 +2,8 @@ module Interpreter where
 
 import Grammar (Term(..))
 
+import Control.Applicative ((<$>), (<*>), pure)
 import Control.Monad (mzero)
-import Data.Functor ((<$>))
 import Data.Maybe (fromJust, isJust)
 
 topShift :: Int -> Term -> Term
@@ -40,10 +40,14 @@ isVal _     = False
 
 -- | Small step evaluator
 eval1 :: Term -> Maybe Term
+eval1 t | isVal t = mzero
+eval1 TVar{} = mzero
+eval1 (TIf TTrue t2 _) = return t2
+eval1 (TIf TFalse _ t3) = return t3
+eval1 (TIf t1 t2 t3) = TIf <$> eval1 t1 <*> pure t2 <*> pure t3
 eval1 (TApp l@(TAbs _ t) v) | isVal v   = return $ termSubst v t
-                        | otherwise = TApp l <$> eval1 v
-eval1 (TApp t1 t2) = flip TApp t2 <$> eval1 t1
-eval1 _           = mzero
+                            | otherwise = TApp l <$> eval1 v
+eval1 (TApp t1 t2) = TApp <$> eval1 t1 <*> pure t2
 
 evals :: Term -> [Term]
 evals = map fromJust . takeWhile isJust . iterate (eval1 =<<) . Just
@@ -54,14 +58,22 @@ eval = last . evals
 
 -- | Big step evaluator
 eval' :: Term -> Maybe Term
+eval' t | isVal t = return t
+eval' (TIf t1 t2 t3) = do
+  t1' <- eval' t1
+  t2' <- eval' t2
+  t3' <- eval' t3
+  case t1' of
+    TTrue  -> return t2'
+    TFalse -> return t3'
+    _      -> mzero
 eval' (TApp t1 t2) = do
   t1' <- eval' t1
   t2' <- eval' t2
   case t1' of
     (TAbs _ t) -> eval' $ termSubst t2' t
     _       -> mzero
-eval' l@TAbs{} = return l
-eval' _       = mzero
+eval' TVar{} = mzero
 
 termSubst :: Term -> Term -> Term
 termSubst sub t = topShift (-1) (subst 0 (topShift 1 sub) t)
