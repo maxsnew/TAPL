@@ -20,7 +20,7 @@ term (TApp t1 t2) = parens (term t1 <+> term t2)
 
 typ :: Type -> Doc
 typ TyBool = text "Bool"
-typ (TyArr ty1 ty2) = left <+> typ ty2
+typ (TyArr ty1 ty2) = left <+> text "→" <+> typ ty2
   where left = case ty1 of
           TyArr{} -> parens . typ $ ty1
           _       -> typ ty1
