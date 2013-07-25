@@ -3,6 +3,9 @@
 (require redex
          redex/tut-subst)
 
+(provide STλcR
+         λcCBVal)
+
 ;; Figure 9-1
 (define-language pureSTλc
   (t x
