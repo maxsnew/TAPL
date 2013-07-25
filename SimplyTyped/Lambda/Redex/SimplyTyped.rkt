@@ -15,7 +15,7 @@
   (T (T → T))
   (Γ ∅
      (Γ x : T))
-  (x variable))
+  (x variable-not-otherwise-mentioned))
 
 (define-extended-language STλc
   pureSTλc
