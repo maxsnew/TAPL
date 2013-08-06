@@ -7,6 +7,7 @@ import Text.PrettyPrint (Doc, (<>), (<+>), hsep, parens, text)
 term :: Term -> Doc
 term TTrue = text "true"
 term TFalse = text "false"
+term (TNat n) = text . show $ n
 term (TIf t1 t2 t3) = hsep [ text "if"
                                 , term t1
                                 , text "then"
@@ -20,6 +21,7 @@ term (TApp t1 t2) = parens (term t1 <+> term t2)
 
 typ :: Type -> Doc
 typ TyBool = text "Bool"
+typ TyNat  = text "Nat"
 typ (TyArr ty1 ty2) = left <+> text "→" <+> typ ty2
   where left = case ty1 of
           TyArr{} -> parens . typ $ ty1
@@ -28,6 +30,7 @@ typ (TyArr ty1 ty2) = left <+> text "→" <+> typ ty2
 namedTerm :: NamedTerm -> Doc
 namedTerm NTrue = text "true"
 namedTerm NFalse = text "false"
+namedTerm (NNat i) = text . show $ i
 namedTerm (NIf t1 t2 t3) = hsep [ text "if"
                                 , namedTerm t1
                                 , text "then"

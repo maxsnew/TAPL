@@ -10,6 +10,7 @@ typeof top = runReaderT (rec top) []
   where rec :: Term -> ReaderT [Type] Maybe Type
         rec TTrue  = return TyBool
         rec TFalse = return TyBool
+        rec TNat{} = return TyNat
         rec (TIf t1 t2 t3) = do
           ty1 <- rec t1
           guard $ ty1 == TyBool

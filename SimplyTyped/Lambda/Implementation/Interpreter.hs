@@ -10,8 +10,7 @@ topShift :: Int -> Term -> Term
 topShift i = shift i 0
 
 shift :: Int -> Int -> Term -> Term
-shift _ _ TTrue = TTrue
-shift _ _ TFalse = TFalse
+shift _ _ t | isVal t = t
 shift inc cut (TIf t1 t2 t3) = TIf (go t1) (go t2) (go t3)
   where go = shift inc cut
 shift inc cut v@(TVar i) | i < cut = v
@@ -23,6 +22,7 @@ shift inc cut (TApp t1 t2) = TApp (shift inc cut t1)
 subst :: Int -> Term -> Term -> Term
 subst _ _ TTrue = TTrue
 subst _ _ TFalse = TFalse
+subst _ _ i@TNat{} = i
 subst var sub (TIf t1 t2 t3) = TIf (go t1) (go t2) (go t3)
   where go = subst var sub
 
@@ -35,6 +35,7 @@ subst var sub (TApp t1 t2) = TApp (subst var sub t1)
 isVal :: Term -> Bool
 isVal TTrue = True
 isVal TFalse = True
+isVal TNat{} = True
 isVal TAbs{} = True
 isVal _     = False
 

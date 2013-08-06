@@ -7,7 +7,7 @@ import Control.Monad.Identity (Identity)
 import Prelude hiding (abs)
 import Text.Parsec hiding ((<|>), many)
 import Text.Parsec.Expr
-import Text.Parsec.Token hiding (parens, lexeme, identifier, reserved, reservedOp, braces, brackets, whiteSpace)
+import Text.Parsec.Token hiding (parens, lexeme, identifier, reserved, reservedOp, braces, brackets, whiteSpace, natural)
 import qualified Text.Parsec.Token as P
 import Text.Parsec.Language
 
@@ -15,11 +15,17 @@ type Parser a = ParsecT String () Identity a
 
 -- | Terms
 term :: Parser NamedTerm
-term = lexeme $ bool <|> if' <|> abs <|> apps <|> parens term
+term = lexeme $ val <|> if' <|> abs <|> apps <|> parens term
+
+val :: Parser NamedTerm
+val = bool <|> nat
 
 bool :: Parser NamedTerm
 bool = resBool "true" NTrue <|> resBool "false" NFalse
   where resBool s nt = reserved s *> return nt
+
+nat :: Parser NamedTerm
+nat = NNat <$> natural
 
 if' :: Parser NamedTerm
 if' = do
@@ -48,7 +54,7 @@ abs = do
 
 apps :: Parser NamedTerm
 apps = do
-  ts <- many1 (var <|> bool <|> parens term)
+  ts <- many1 (var <|> val <|> parens term)
   return $ case ts of
     [t]    -> t
     (t:ts') -> foldl NApp t ts'
@@ -57,9 +63,11 @@ apps = do
 -- | Types
 typ :: Parser Type
 typ = (buildExpressionParser table $
-       (reserved "Bool" *> pure TyBool)
+       resTyp "Bool" TyBool
+       <|> resTyp "Nat" TyNat
        <|> parens typ)
       <?> "type"
+  where resTyp s t = reserved s *> pure t
 
 table :: OperatorTable String () Identity Type
 table = [[Infix (reservedOp "->" *> return TyArr) AssocRight]]
@@ -78,6 +86,8 @@ reserved :: String -> Parser ()
 reserved = lexeme . P.reserved lambdaCal
 reservedOp :: String -> Parser ()
 reservedOp = lexeme . P.reservedOp lambdaCal
+natural :: Parser Integer
+natural = lexeme $ P.natural lambdaCal
 
 lambdaStyle :: LanguageDef st
 lambdaStyle = emptyDef {
@@ -90,6 +100,6 @@ lambdaStyle = emptyDef {
   , opStart        = oneOf ".-:"
   , opLetter       = oneOf ""
   , reservedOpNames= ["->", ".", ":"]
-  , reservedNames  = ["lambda", "λ", "Bool", "if", "then", "else", "true", "false"]
+  , reservedNames  = ["lambda", "λ", "Bool", "Nat", "if", "then", "else", "true", "false"]
   , caseSensitive  = True
   }
