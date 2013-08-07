@@ -10,12 +10,14 @@ import Data.Set as Set (Set, empty, singleton, toList, union, unions)
 import Test.QuickCheck (Arbitrary(..), elements, oneof, sized)
 
 -- | Simply Typed Lambda Calculus
-data Type = TyBool
+data Type = TyUnit
+          | TyBool
           | TyNat
           | TyArr Type Type
           deriving (Show, Eq)
 
-data Term = TTrue
+data Term = TUnit
+          | TTrue
           | TFalse
           | TNat Integer
           | TIf Term Term Term
@@ -25,7 +27,8 @@ data Term = TTrue
           deriving (Show, Eq)
 
 -- | Untyped Lambda Calculus using explicit variable names.
-data NamedTerm = NTrue
+data NamedTerm = NUnit
+               | NTrue
                | NFalse
                | NNat Integer
                | NIf NamedTerm NamedTerm NamedTerm
@@ -48,6 +51,7 @@ removeNames t = withFree $ runReader (rec t) free
         rec nt = do
           ctx <- ask
           case nt of
+            NUnit -> return TUnit
             NTrue -> return TTrue
             NFalse -> return TFalse
             NNat i -> return $ TNat i
@@ -65,6 +69,7 @@ freeVars t = Set.toList $ runReader (go t) []
         go nt = do
           bound <- ask
           case nt of
+            NUnit      -> return Set.empty
             NTrue      -> return Set.empty
             NFalse     -> return Set.empty
             NNat{}     -> return Set.empty
@@ -85,6 +90,7 @@ freeVars t = Set.toList $ runReader (go t) []
 restoreNames :: Term -> [String] -> NamedTerm
 restoreNames t' ctx = runReader (rec t') (nameCtx)
   where rec :: Term -> Reader ([String], [String]) NamedTerm
+        rec TUnit          = return NUnit
         rec TTrue          = return NTrue
         rec TFalse         = return NFalse
         rec (TNat i)       = return $ NNat i
@@ -101,18 +107,17 @@ restoreNames t' ctx = runReader (rec t') (nameCtx)
 -- | Testing
 instance Arbitrary Type where
   arbitrary = sized type'
-    where type' 0 = elements [TyBool, TyNat]
+    where type' 0 = elements [TyUnit, TyBool, TyNat]
           type' n = TyArr <$> halved <*> halved
             where halved = type' (n `div` 2)
   shrink (TyArr t1 t2) = [t1, t2]
-  shrink TyBool        = []
-  shrink TyNat         = []
+  shrink _             = []
 
 instance Arbitrary Term where
   arbitrary = sized term'
     where term' 0 = oneof $ (TVar . abs <$> arbitrary)
                     : (TNat <$> arbitrary)
-                    : map return [TTrue, TFalse]
+                    : map return [TUnit, TTrue, TFalse]
           term' n = oneof [ TIf <$> thirded <*> thirded <*> thirded
                           , TAbs <$> arbitrary <*> (term' (n-1))
                           , TApp <$> halved <*> halved

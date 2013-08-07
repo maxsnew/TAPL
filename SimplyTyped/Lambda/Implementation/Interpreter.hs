@@ -20,19 +20,18 @@ shift inc cut (TApp t1 t2) = TApp (shift inc cut t1)
                                   (shift inc cut t2)
 
 subst :: Int -> Term -> Term -> Term
-subst _ _ TTrue = TTrue
-subst _ _ TFalse = TFalse
-subst _ _ i@TNat{} = i
+subst var sub (TAbs ty t)  = TAbs ty (subst (var+1) (shift 1 0 sub) t)
+subst _ _ t | isVal t = t
 subst var sub (TIf t1 t2 t3) = TIf (go t1) (go t2) (go t3)
   where go = subst var sub
 
 subst var sub t@(TVar i) | var == i  = sub
                          | otherwise = t
-subst var sub (TAbs ty t)  = TAbs ty (subst (var+1) (shift 1 0 sub) t)
 subst var sub (TApp t1 t2) = TApp (subst var sub t1)
                                   (subst var sub t2)
 
 isVal :: Term -> Bool
+isVal TUnit = True
 isVal TTrue = True
 isVal TFalse = True
 isVal TNat{} = True

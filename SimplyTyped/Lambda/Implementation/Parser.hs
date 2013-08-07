@@ -18,11 +18,17 @@ term :: Parser NamedTerm
 term = lexeme $ val <|> if' <|> abs <|> apps <|> parens term
 
 val :: Parser NamedTerm
-val = bool <|> nat
+val = bool <|> nat <|> unit
+
+unit :: Parser NamedTerm
+unit = reservedPure "unit" NUnit
 
 bool :: Parser NamedTerm
-bool = resBool "true" NTrue <|> resBool "false" NFalse
-  where resBool s nt = reserved s *> return nt
+bool = reservedPure "true" NTrue
+       <|> reservedPure "false" NFalse
+
+reservedPure :: String -> a -> Parser a
+reservedPure s nt = reserved s *> pure nt
 
 nat :: Parser NamedTerm
 nat = NNat <$> natural
@@ -63,11 +69,11 @@ apps = do
 -- | Types
 typ :: Parser Type
 typ = (buildExpressionParser table $
-       resTyp "Bool" TyBool
-       <|> resTyp "Nat" TyNat
+       reservedPure "Unit" TyUnit
+       <|> reservedPure "Bool" TyBool
+       <|> reservedPure "Nat" TyNat
        <|> parens typ)
       <?> "type"
-  where resTyp s t = reserved s *> pure t
 
 table :: OperatorTable String () Identity Type
 table = [[Infix (reservedOp "->" *> return TyArr) AssocRight]]
@@ -100,6 +106,7 @@ lambdaStyle = emptyDef {
   , opStart        = oneOf ".-:"
   , opLetter       = oneOf ""
   , reservedOpNames= ["->", ".", ":"]
-  , reservedNames  = ["lambda", "λ", "Bool", "Nat", "if", "then", "else", "true", "false"]
+  , reservedNames  = ["lambda", "λ", "unit", "Unit", "Bool", "true", "false",
+                       "if", "then", "else", "Nat"]
   , caseSensitive  = True
   }

@@ -5,6 +5,7 @@ import Grammar (Type(..), Term(..), NamedTerm(..))
 import Text.PrettyPrint (Doc, (<>), (<+>), hsep, parens, text)
 
 term :: Term -> Doc
+term TUnit = text "unit"
 term TTrue = text "true"
 term TFalse = text "false"
 term (TNat n) = text . show $ n
@@ -20,6 +21,7 @@ term (TAbs ty t) = text "λ" <+> typ ty <> text "." <+> term t
 term (TApp t1 t2) = parens (term t1 <+> term t2)
 
 typ :: Type -> Doc
+typ TyUnit = text "Unit"
 typ TyBool = text "Bool"
 typ TyNat  = text "Nat"
 typ (TyArr ty1 ty2) = left <+> text "→" <+> typ ty2
@@ -28,6 +30,7 @@ typ (TyArr ty1 ty2) = left <+> text "→" <+> typ ty2
           _       -> typ ty1
 
 namedTerm :: NamedTerm -> Doc
+namedTerm NUnit = text "unit"
 namedTerm NTrue = text "true"
 namedTerm NFalse = text "false"
 namedTerm (NNat i) = text . show $ i

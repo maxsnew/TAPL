@@ -8,6 +8,7 @@ import Control.Monad.Reader
 typeof :: Term -> Maybe Type
 typeof top = runReaderT (rec top) []
   where rec :: Term -> ReaderT [Type] Maybe Type
+        rec TUnit  = return TyUnit
         rec TTrue  = return TyBool
         rec TFalse = return TyBool
         rec TNat{} = return TyNat
