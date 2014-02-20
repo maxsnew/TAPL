@@ -16,7 +16,8 @@ data Expr =
     EVar ExpN
   | Lam (Bind (ExpN, Embed Type) Expr)
   | LAM (Bind TypN Expr)
-  | App Expr Expr
+  | App   Expr Expr
+  | TyApp Expr Type
   deriving (Show)
 
 data Type =

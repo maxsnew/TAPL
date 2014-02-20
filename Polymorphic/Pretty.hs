@@ -24,6 +24,10 @@ expr e = case e of
     p1 <- expr e1
     p2 <- expr e2
     return $ parens $ p1 <+> p2
+  TyApp e t -> do
+    pe <- expr e
+    pt <- typ  t
+    return $ parens $ pe <+> brackets tp
 
 typ :: (Fresh m) => Type -> m Doc
 typ t = case t of

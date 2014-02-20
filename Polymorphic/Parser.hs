@@ -56,11 +56,17 @@ bod = lam <|> lAM <|> apps
 
 apps :: Parser Expr
 apps = do
-  ts <- many1 (var <|> parens expr)
-  return $ case ts of
-    [t]    -> t
-    (t:ts') -> foldl App t ts'
+  e1  <- varOrParens
+  ets <- many (Left <$> varOrParens <|> Right <$> brackets typ)
+  return $ case ets of
+    [] -> e1
+    _  -> foldl apply e1 ets
   <?> "function application"
+  where varOrParens = var <|> parens expr
+        apply :: Expr -> Either Expr Type -> Expr
+        apply e et = case et of
+          Left e2 -> App   e e2
+          Right t -> TyApp e t
 
 -- | Types
 typ :: Parser Type
@@ -88,9 +94,6 @@ tyVar :: Parser Type
 tyVar = (TyVar <$> freshVar)
         <?> "type variable"
 
--- table :: OperatorTable String () Identity Type
--- table = [ [Infix (reservedOp "->" *> return TyArr) AssocRight] ]
-
 -- | Lexing
 lambdaCal :: GenTokenParser String u FreshM
 lambdaCal = makeTokenParser lambdaStyle
@@ -99,6 +102,8 @@ lexeme :: Parser a -> Parser a
 lexeme = P.lexeme lambdaCal
 parens :: Parser a -> Parser a
 parens = lexeme . P.parens lambdaCal
+brackets :: Parser a -> Parser a
+brackets = lexeme . P.brackets lambdaCal
 identifier :: Parser String
 identifier = lexeme $ P.identifier lambdaCal
 reserved :: String -> Parser ()
