@@ -17,7 +17,7 @@ cabal-version:       >=1.10
 
 executable poly
   main-is:             Main.hs
-  other-modules:       Grammar, Parser
+  other-modules:       Grammar, Parser, Pretty
   -- other-extensions:    
   build-depends:       base >=4.6 && <4.7,
                        mtl >=2.1 && <2.2, 

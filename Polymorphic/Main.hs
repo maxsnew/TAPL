@@ -1,8 +1,10 @@
 module Main where
 
 import Grammar
-import Parser
+import qualified Parser
+import qualified Pretty
 
+import Control.Applicative
 import Control.Monad.IO.Class
 import System.Console.Haskeline
 import Unbound.LocallyNameless
@@ -18,8 +20,12 @@ repl = do
   case inp of
     Nothing -> return ()
     Just t -> do
-      let me = runFreshM $ defRunParser expr t
-      liftIO $ case me of
-        Left err -> print me
-        Right t -> print t
+      liftIO $ putStrLn $ runFreshM $ interp t
       repl
+
+interp :: String -> FreshM String
+interp s = do
+  me <- Parser.defRunParser Parser.expr s
+  case me of
+    Left err -> return $ show err
+    Right e  -> show <$> Pretty.expr e

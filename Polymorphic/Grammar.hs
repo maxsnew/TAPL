@@ -14,7 +14,7 @@ type ExpN = Name Expr
 type TypN = Name Type
 data Expr =
     EVar ExpN
-  | Lam (Bind (ExpN, Type) Expr)
+  | Lam (Bind (ExpN, Embed Type) Expr)
   | LAM (Bind TypN Expr)
   | App Expr Expr
   deriving (Show)

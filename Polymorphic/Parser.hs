@@ -41,7 +41,7 @@ lam = do
   ty <- typ
   reservedOp "."
   e <- bod
-  return $ Lam (bind (v, ty) e)
+  return $ Lam (bind (v, embed ty) e)
   <?> "λ abstraction"
 
 lAM :: Parser Expr
