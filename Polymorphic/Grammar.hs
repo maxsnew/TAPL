@@ -29,4 +29,16 @@ data Type =
 instance Alpha Expr where
 instance Alpha Type where
 
+instance Subst Expr Expr where
+  isVar (EVar x) = Just (SubstName x)
+  isVar _        = Nothing
+
+instance Subst Expr Type where
+  isVar _ = Nothing
+
+instance Subst Type Type where
+  isVar (TyVar x) = Just (SubstName x)
+  isVar _         = Nothing
+         
+  
 $(derive [''Expr, ''Type])

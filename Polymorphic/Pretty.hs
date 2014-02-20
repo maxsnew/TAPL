@@ -27,7 +27,7 @@ expr e = case e of
   TyApp e t -> do
     pe <- expr e
     pt <- typ  t
-    return $ parens $ pe <+> brackets tp
+    return $ parens $ pe <+> brackets pt
 
 typ :: (Fresh m) => Type -> m Doc
 typ t = case t of
@@ -35,7 +35,7 @@ typ t = case t of
   TyArr t1 t2 -> do
     p1 <- typ t1
     p2 <- typ t2
-    return $ p1 <+> text "->" <+> p2
+    return $ parens p1 <+> text "->" <+> p2
   TyLam bnd -> do
     (n, ty) <- unbind bnd
     let pn = name n

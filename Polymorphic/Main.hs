@@ -1,5 +1,6 @@
 module Main where
 
+import Checker
 import Grammar
 import qualified Parser
 import qualified Pretty
